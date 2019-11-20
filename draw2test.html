@@ -1,0 +1,39 @@
+<html>
+	<head>
+		<title>No Title</title>
+		<script src="https://d3js.org/d3.v5.min.js"></script>
+		<script src="logic.js"></script>
+
+		<style>
+			#svg {
+				border : black solid 1px;
+			}
+
+		</style>
+	</head>
+	<body>
+		<span>Currently working on the following drawing:</span>
+		<select id="pastdrawings"></select>
+
+		<input type="text" id="drawingname">
+
+	  <button id="savedrawing">Save</button>
+
+		<select id="color"></select>
+
+		<span id="widthlabel">26</span>
+		<input id="widthrange" type="range" step="1" min="1" max="50"/>
+
+		<button id="clear">Clear canvas</button>
+
+		<button id="playback">Playback</button>
+
+		<span id="playbackspeedlabel">05</span>
+		<input id="playbackspeedrange" type="range" step="1" min="1" max="75"/>
+
+
+		<button id="clearlocalStorage">Clear localStorage</button>
+
+		<svg id="svg" style="width:100%; height: 550px"/>
+	</body>
+ </html>
