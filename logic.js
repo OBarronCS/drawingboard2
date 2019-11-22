@@ -4,34 +4,136 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const svg = d3.select("#svg")
 
-  var lastpoint = [0,0]
-
+  var currentIndex = 0;
   var isPlayingBack = false;
   var playbackNum = 0;
   var autoDrawInterval = null;
 
+  var lastpoint = [0,0]
   var drawing = false;
   var counter = 0;
 
 
-  function startNewDrawing(){
-    document.querySelector("#drawingname").value = "drawing0";
-
-    saveDrawing();
-
-    const pastdrawingselect = document.querySelector("#pastdrawings")
-
-    var opt = document.createElement('option');
-    opt.value = 0
-    opt.innerHTML = "drawing0"
-    opt.style.backgroundColor = "darkgray";
-
-    pastdrawingselect.appendChild(opt);
-
-  }
 
   if(localStorage.length == 0){
     startNewDrawing()
+  } else {
+      populatePastDrawings(); //populates it on startup
+      selectPastDrawing(0)
+  }
+
+  function startNewDrawing(){
+    //clears the canvas
+    svg.selectAll("*").remove();
+
+    let name = "drawing" + localStorage.length;
+
+    document.querySelector("#drawingname").value = name;
+
+    currentIndex = localStorage.length;
+
+    clearInterval(autoDrawInterval);
+    isPlayingBack = false;
+    playbackNum = 0;
+    autoDrawInterval = null;
+    counter = 0;
+
+    currentpoints = []
+
+    saveCurrentDrawing(); //this  saves the fact that you started a new drawing to the local localStorage
+  }
+
+  function saveCurrentDrawing(){
+    let name = document.querySelector("#drawingname").value
+
+    //make sure user has named the drawing
+    if(name.length == 0) {
+      alert('Please, name the drawing')
+      return;
+    }
+
+    localStorage.setItem(currentIndex, JSON.stringify({"name" : name, "points": currentpoints}))
+    populatePastDrawings();
+  }
+
+  function populatePastDrawings(){
+
+
+      const playbackselect = document.querySelector("#pastdrawings")
+
+      playbackselect.innerHTML = ''; //makes it empty, so I can refill it
+
+      for (var i = 0; i < localStorage.length; i++){
+          var opt = document.createElement('option');
+          opt.value = i
+          opt.innerHTML = JSON.parse(localStorage.getItem(i))["name"]
+          opt.style.backgroundColor = "darkgray";
+          playbackselect.appendChild(opt);
+        }
+
+
+        document.querySelector("#pastdrawings").selectedIndex = currentIndex;
+  }
+
+  //gets it from memory
+  function selectPastDrawing(index){
+    //index represents the one in localStorage where the drawing info is held
+    svg.selectAll("*").remove();
+
+    clearInterval(autoDrawInterval);
+    isPlayingBack = false;
+    playbackNum = 0;
+    autoDrawInterval = null;
+    counter = 0;
+
+    currentIndex = index;
+
+    currentpoints = JSON.parse(localStorage.getItem(index))["points"]
+
+    let name = JSON.parse(localStorage.getItem(index))["name"]
+
+    document.querySelector("#drawingname").value = name;
+
+    playBackInstantly()
+  }
+
+  //plays back the currentpoints instantly
+  function playBackInstantly(){
+
+    clearInterval(autoDrawInterval);
+    isPlayingBack = false;
+    playbackNum = 0;
+    autoDrawInterval = null;
+    counter = 0;
+
+    for(let i = 0; i < currentpoints.length; i++){
+      playbackDraw()
+    }
+
+    counter = 0;
+    playbackNum = 0;
+  }
+
+
+  document.querySelector("#pastdrawings").onchange = () => {
+    selectPastDrawing(document.querySelector("#pastdrawings").value)
+  }
+
+
+
+  document.querySelector("#savedrawing").onclick = () => {
+    saveCurrentDrawing();
+  }
+
+  document.querySelector("#newdrawing").onclick = () => {
+    startNewDrawing();
+  }
+
+
+
+  document.querySelector("#clearlocalStorage").onclick = () => {
+    localStorage.clear();
+    populatePastDrawings();
   }
 
   svg.on("mousedown", () => {
@@ -124,77 +226,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    //selecting other drawings
-    /*
-    document.querySelector("#pastdrawings").onchange = () => {
-      //when you decide to work on another drawing...
-      saveDrawing() // saves current drawing
-
-      let drawingselect = document.querySelector("#pastdrawings");
-
-      clearCanvas(); //makes the canvas blank
-      document.querySelector("#drawingname").value = JSON.parse(localStorage.getItem(drawingselect.value))["name"];
-
-      //reset some variables
-      isPlayingBack = false;
-      clearInterval(autoDrawInterval);
-      counter = 0;
-      playbackNum = 0;
-
-      currentpoints = JSON.parse(localStorage.getItem(drawingselect.value))["points"]
-
-      currentname = JSON.parse(localStorage.getItem(drawingselect.value))["name"]
-    }
-    */
-
-    function populatePastDrawings(){
-
-        const playbackselect = document.querySelector("#pastdrawings")
-
-        playbackselect.innerHTML = '';
-
-        for (var i = 0; i < localStorage.length; i++){
-            var opt = document.createElement('option');
-            opt.value = i
-            opt.innerHTML = JSON.parse(localStorage.getItem(i))["name"]
-            opt.style.backgroundColor = "darkgray";
-            playbackselect.appendChild(opt);
-          }
-    }
-
-    populatePastDrawings()
-
-    document.querySelector("#clearlocalStorage").onclick = () => {
-      localStorage.clear();
-      populatePastDrawings();
-    }
-
-
-    function saveDrawing(){
-      let name = document.querySelector("#drawingname").value
-
-      //if it is empty
-      if(name.length == 0) {
-        alert('Please, name the drawing')
-        return;
-      }
-
-      for (var i = 0; i < localStorage.length; i++){
-          if(JSON.parse(localStorage.getItem(i))["name"] == name){
-            localStorage.setItem(i, JSON.stringify({"name" : name, "points": currentpoints}))
-            populatePastDrawings();
-            return;
-          }
-        }
-
-      localStorage.setItem(localStorage.length, JSON.stringify({"name" : name, "points": currentpoints}))
-    }
-
-
-
-    document.querySelector("#savedrawing").onclick = () => {
-      saveDrawing();
-    }
 
     document.querySelector("#widthrange").oninput = () =>{
       setWidthLabel();
@@ -239,15 +270,6 @@ document.addEventListener("DOMContentLoaded", () => {
         clearInterval(autoDrawInterval);
         autoDrawInterval = setInterval(playbackDraw, document.querySelector("#playbackspeedrange").value)
       }
-    }
-
-    function clearCanvas(){
-      svg.selectAll("*").remove();
-    }
-
-    document.querySelector("#clear").onclick = () => {
-      svg.selectAll("*").remove();
-      points = [];
     }
 
     const colors = ["Red", "Green", "Blue","Black","Magenta","White","Lime","Gold"]
