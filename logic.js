@@ -130,13 +130,6 @@ document.addEventListener("DOMContentLoaded", () => {
     startNewDrawing();
   }
 
-
-
-  document.querySelector("#clearlocalStorage").onclick = () => {
-    localStorage.clear();
-    populatePastDrawings();
-  }
-
   svg.on("mousedown", () => {
     drawing = true;
   });
