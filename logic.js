@@ -78,6 +78,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   //gets it from memory
   function selectPastDrawing(index){
+    //saves current on
+
     //index represents the one in localStorage where the drawing info is held
     svg.selectAll("*").remove();
 
