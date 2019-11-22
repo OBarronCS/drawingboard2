@@ -40,7 +40,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     currentpoints = []
 
-    saveCurrentDrawing(); //this  saves the fact that you started a new drawing to the local localStorage
+    //this  saves the fact that you started a new drawing to the local localStorage
+    saveCurrentDrawing();
   }
 
   function saveCurrentDrawing(){
@@ -271,6 +272,12 @@ document.addEventListener("DOMContentLoaded", () => {
         autoDrawInterval = setInterval(playbackDraw, document.querySelector("#playbackspeedrange").value)
       }
     }
+
+     document.querySelector("#drawingname").onkeydown = e => {
+       if(e.keyCode == 13){
+          saveCurrentDrawing();
+        }
+     }
 
     const colors = ["Red", "Green", "Blue","Black","Magenta","White","Lime","Gold"]
 
