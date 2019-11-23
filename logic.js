@@ -297,8 +297,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-
-
     document.querySelector("#playbackspeedrange").value = 5;
 
     document.querySelector("#playbackspeedrange").oninput = () =>{
