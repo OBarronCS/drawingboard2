@@ -1,5 +1,33 @@
 document.addEventListener("DOMContentLoaded", () => {
 
+
+      const colors = ["Red", "Green", "Blue","Black","Magenta","White","Lime","Gold"]
+
+      const colorselect = document.querySelector("#color")
+
+      for (var i = 0; i < colors.length; i++){
+          var opt = document.createElement('option');
+          opt.value = colors[i];
+          opt.innerHTML = colors[i];
+          opt.style.color = colors[i];
+          opt.style.backgroundColor = "darkgray";
+          colorselect.appendChild(opt);
+      }
+
+      const backgroundselect = document.querySelector("#background")
+
+      const bcolors = ["White", "Pink", "Lightblue", "Gray", "Magenta", "Yellow", "Orange"]
+
+      for (var i = 0; i < bcolors.length; i++){
+          var opt = document.createElement('option');
+          opt.value = bcolors[i];
+          opt.innerHTML = bcolors[i];
+          opt.style.color = bcolors[i];
+          opt.style.backgroundColor = "darkgray";
+          backgroundselect.appendChild(opt);
+      }
+
+
   var currentpoints = []; //will be an array to hold arrays
 
   const svg = d3.select("#svg")
@@ -25,6 +53,10 @@ document.addEventListener("DOMContentLoaded", () => {
   function startNewDrawing(){
     //clears the canvas
     svg.selectAll("*").remove();
+
+    document.querySelector("#background").selectedIndex = 0;
+    document.querySelector("#svg").style.backgroundColor = "White";
+
 
     let name = "drawing" + localStorage.length;
 
@@ -53,7 +85,8 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    localStorage.setItem(currentIndex, JSON.stringify({"name" : name, "points": currentpoints}))
+    localStorage.setItem(currentIndex, JSON.stringify({"name" : name, "points": currentpoints, "background": document.querySelector("#background").value}))
+
     populatePastDrawings();
   }
 
@@ -96,6 +129,17 @@ document.addEventListener("DOMContentLoaded", () => {
     let name = JSON.parse(localStorage.getItem(index))["name"]
 
     document.querySelector("#drawingname").value = name;
+
+    let bcolor = JSON.parse(localStorage.getItem(index))["background"];
+
+    document.querySelector("#svg").style.backgroundColor = bcolor;
+
+    for (let i = 0; i < document.querySelector("#background").options.length; i++) {
+       if (document.querySelector("#background").options[i].value == bcolor) {
+           document.querySelector("#background").options[i].selected = true;
+           break;
+       }
+   }
 
     playBackInstantly()
   }
@@ -248,6 +292,12 @@ document.addEventListener("DOMContentLoaded", () => {
       setWidthLabel()
     };
 
+    document.querySelector("#background").onchange = () => {
+      document.querySelector("#svg").style.backgroundColor = document.querySelector("#background").value;
+    }
+
+
+
 
     document.querySelector("#playbackspeedrange").value = 5;
 
@@ -274,16 +324,4 @@ document.addEventListener("DOMContentLoaded", () => {
         }
      }
 
-    const colors = ["Red", "Green", "Blue","Black","Magenta","White","Lime","Gold"]
-
-    const colorselect = document.querySelector("#color")
-
-    for (var i = 0; i < colors.length; i++){
-        var opt = document.createElement('option');
-        opt.value = colors[i];
-        opt.innerHTML = colors[i];
-        opt.style.color = colors[i];
-        opt.style.backgroundColor = "darkgray";
-        colorselect.appendChild(opt);
-    }
   });
